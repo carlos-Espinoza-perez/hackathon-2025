@@ -69,14 +69,8 @@ El proyecto sigue una **arquitectura por capas** que separa las responsabilidade
    # Puerto de la aplicación
    PORT=3000
    
-   <!-- # Base de datos
-   DATABASE_URL=postgresql://usuario:password@localhost:5432/nombre_db -->
-   
-   <!-- # JWT Secret
-   JWT_SECRET=tu-clave-secreta-muy-segura -->
-   
-   <!-- # Entorno
-   NODE_ENV=development -->
+   # Entorno
+   NODE_ENV=DEV
    ```
 
 <!-- 4. **Configurar base de datos** *(si aplica)*
@@ -141,7 +135,7 @@ El proyecto utiliza las siguientes configuraciones principales:
 Una vez ejecutando la aplicación, podrás acceder a:
 
 - **Health Check**: `GET /health`
-<!-- - **API Documentation**: `GET /api-docs` *(si Swagger está configurado)* -->
+- **API Documentation**: `GET /api-docs` 
 - **Base URL**: `http://localhost:3000/api`
 
 <!-- ## 🧪 Testing
@@ -173,6 +167,7 @@ npm test -- --grep "nombre-del-test"
 | Variable | Descripción | Valor por defecto |
 |----------|-------------|-------------------|
 | `PORT` | Puerto del servidor | `3000` |
+| `NODE_ENV` | Entorno de desarollo | `DEV` |
 
 ---
 
