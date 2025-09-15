@@ -155,6 +155,9 @@ npm test -- --grep "nombre-del-test"
 |----------|-------------|-------------------|
 | `PORT` | Puerto del servidor | `3000` |
 | `NODE_ENV` | Entorno de desarollo | `DEV` |
+| `DATABASE_URL` | Base de datos en Supabase | `` |
+| `SUPABASE_SERVICE_ROLE_KEY` | Llave para autenticacion con Auth login supabase | `` |
+| `SUPABASE_URL` | Url del servicio en Supabase | `` |
 
 ---
 
