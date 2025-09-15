@@ -1,9 +1,11 @@
 // src/routes/user.routes.ts
 import { Router } from "express";
-import { getUsers } from "../controllers/user.controller.js";
+import { deleteUser, login, profile, register } from "../controllers/user.controller.js";
 
 const router = Router();
 
-router.get("/", getUsers);
-
+router.post('/register', register);
+router.post('/login', login);
+router.post('/delete', deleteUser);
+router.get('/profile', profile);
 export default router;
