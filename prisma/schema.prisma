@@ -1,0 +1,114 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+
+/// Enums
+enum EnumDificultad {
+  Novato
+  Intermedio
+  Avanzado
+}
+
+enum EnumTipoAcademia {
+  Academia
+  Laboratorio
+}
+
+/// Tablas
+model Usuario {
+  id             String              @id @default(uuid())
+  nombre         String
+  correo         String              @unique
+  avatar         String?
+  contrasena     String
+  estado         Boolean             @default(true)
+  fechaRegistro  DateTime            @default(now())
+  inscripciones  InscripcionUsuario[]
+}
+
+model Academia {
+  id             String     @id @default(uuid())
+  nombre         String
+  descripcion    String
+  avatar         String?
+  tipoAcademia   EnumTipoAcademia
+  dificultad     EnumDificultad
+  estado         Boolean    @default(true)
+  fechaRegistro  DateTime   @default(now())
+  cursos         Curso[]
+}
+
+model Curso {
+  id             String        @id @default(uuid())
+  nombre         String
+  descripcion    String
+  avatar         String?
+  videoUrl       String?
+  academiaId     String
+  academia       Academia      @relation(fields: [academiaId], references: [id])
+  dificultad     EnumDificultad
+  estado         Boolean       @default(true)
+  fechaRegistro  DateTime      @default(now())
+  sesiones       SesionCurso[]
+  inscripciones  InscripcionUsuario[]
+}
+
+model SesionCurso {
+  id             String              @id @default(uuid())
+  nombre         String
+  descripcion    String
+  avatar         String?
+  videoUrl       String?
+  lecturaUrl     String?
+  cursoId        String
+  curso          Curso               @relation(fields: [cursoId], references: [id])
+  estado         Boolean             @default(true)
+  fechaRegistro  DateTime            @default(now())
+  materiales     MaterialSesionCurso[]
+  inscripciones  InscripcionUsuario[]
+}
+
+model MaterialSesionCurso {
+  id                  String     @id @default(uuid())
+  identificadorManual String?
+  nombre              String
+  descripcion         String?
+  avatar              String?
+  archivoUrl          String?
+  instruccion         String?
+  estado              Boolean    @default(true)
+  fechaRegistro       DateTime   @default(now())
+  sesionCursoId       String
+  sesionCurso         SesionCurso @relation(fields: [sesionCursoId], references: [id])
+  inscripciones       InscripcionUsuario[]
+}
+
+model InscripcionUsuario {
+  id                    String               @id @default(uuid())
+  usuarioId             String
+  cursoId               String?
+  sesionCursoId         String?
+  materialSesionCursoId String?
+  avance                Decimal?             @db.Decimal(10, 2)
+  estado                Boolean              @default(true)
+  fechaRegistro         DateTime             @default(now())
+
+  usuario               Usuario              @relation(fields: [usuarioId], references: [id])
+  curso                 Curso?               @relation(fields: [cursoId], references: [id])
+  sesionCurso           SesionCurso?         @relation(fields: [sesionCursoId], references: [id])
+  materialSesionCurso   MaterialSesionCurso? @relation(fields: [materialSesionCursoId], references: [id])
+}

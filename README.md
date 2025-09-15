@@ -42,7 +42,7 @@ El proyecto sigue una **arquitectura por capas** que separa las responsabilidade
 
 - [Node.js](https://nodejs.org/) (versión 18 o superior)
 - [npm](https://www.npmjs.com/) o [yarn](https://yarnpkg.com/)
-<!-- - Base de datos (especificar según tu proyecto: PostgreSQL, MongoDB, etc.) -->
+- Base de datos (PostgreSQL)
 
 ### Instalación
 
@@ -71,16 +71,18 @@ El proyecto sigue una **arquitectura por capas** que separa las responsabilidade
    
    # Entorno
    NODE_ENV=DEV
+
+   # Configuracion Supabase (Gestor de db, Auth login)
+   DATABASE_URL="URL de la base de datos en supabase"
+   SUPABASE_SERVICE_ROLE_KEY="Llave para autenticacion con Auth login supabase"
+   SUPABASE_URL="Url del servicio en Supabase"
    ```
 
-<!-- 4. **Configurar base de datos** *(si aplica)*
+4. **Configurar base de datos**
    ```bash
    # Ejecutar migraciones
-   npm run db:migrate
-   
-   # Ejecutar seeders (datos de prueba)
-   npm run db:seed
-   ``` -->
+   npx prisma db push
+   ```
 
 ## 🛠️ Scripts Disponibles
 
@@ -88,24 +90,8 @@ El proyecto sigue una **arquitectura por capas** que separa las responsabilidade
 # Desarrollo con recarga automática
 npm run dev
 
-# # Compilar TypeScript a JavaScript
-# npm run build
-
-# # Ejecutar en producción
-# npm start
-
-# # Ejecutar pruebas
-# npm test
-
-# # Ejecutar pruebas en modo watch
-# npm run test:watch
-
-# # Linting y formateo
-# npm run lint
-# npm run format
-
-# # Verificar tipos de TypeScript
-# npm run type-check
+# Compilar TypeScript a JavaScript
+npm run build
 ```
 
 ## 🚀 Ejecución Local
@@ -115,6 +101,7 @@ npm run dev
 npm run dev
 ```
 La aplicación estará disponible en: `http://localhost:3000`
+La documentación Swagger estará disponible en: `http://localhost:3000/api-docs`
 
 ### Modo Producción
 ```bash

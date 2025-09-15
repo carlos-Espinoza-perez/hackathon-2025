@@ -19,7 +19,7 @@ const options: swaggerJsdoc.Options = {
       {
         url: process.env.NODE_ENV === 'production'
           ? 'https://tu-api-produccion.com/api/v1'
-          : `http://localhost:${process.env.PORT || 3000}/api/v1`,
+          : `http://localhost:${process.env.PORT || 3000}/api`,
         description: process.env.NODE_ENV === 'production'
           ? 'Servidor de producción'
           : 'Servidor de desarrollo',
