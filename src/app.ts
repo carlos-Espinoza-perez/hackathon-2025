@@ -15,9 +15,9 @@ app.use(express.json({ limit: '10mb' })); // Parser JSON
 app.use(express.urlencoded({ extended: true })); // Parser URL encoded
 
 // Configurar Swagger (solo en desarrollo y testing)
-// if (process.env.NODE_ENV !== 'production') {
-// }
-setupSwagger(app);
+if (process.env.NODE_ENV !== 'production') {
+  setupSwagger(app);
+}
 
 // Health check endpoint
 app.get('/health', (req, res) => {
