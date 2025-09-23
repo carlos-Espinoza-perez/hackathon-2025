@@ -1,6 +1,11 @@
 import supabase from "../config/supabaseClient.js";
 
 export async function signUp(nombre: string, email: string, password: string) {
+  if (!nombre || !email || !password) {
+    throw new Error('Nombre, correo y contraseña son obligatorios');
+  }
+
+
   // 1. Crear usuario en Supabase Auth
   const { data: authData, error: authError } = await supabase.auth.admin.createUser({
     email,
@@ -16,12 +21,12 @@ export async function signUp(nombre: string, email: string, password: string) {
   const { data: usuarioData, error: usuarioError } = await supabase
     .from('Usuario')
     .insert({
-      id: userId,
-      nombre,
-      correo: email,
-      estado: true,
-      contrasena: "",
-      fechaRegistro: new Date(),
+      Id: userId,
+      Nombre: nombre,
+      Correo: email,
+      Estado: true,
+      Contrasena: "",
+      FechaRegistro: new Date(),
     })
     .select()
     .single();
@@ -32,6 +37,9 @@ export async function signUp(nombre: string, email: string, password: string) {
 }
 
 export async function signIn(email: string, password: string) {
+  if (!email || !password) 
+    throw new Error('Correo y contraseña son obligatorios');
+
   // 1. Login con Supabase Auth
   const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
     email,
@@ -47,7 +55,7 @@ export async function signIn(email: string, password: string) {
   const { data: usuarioData, error: usuarioError } = await supabase
     .from('Usuario')
     .select('*')
-    .eq('id', userId)
+    .eq('Id', userId)
     .single();
 
   if (usuarioError) throw usuarioError;
@@ -56,18 +64,20 @@ export async function signIn(email: string, password: string) {
 }
 
 export async function deleteUserByEmail(email: string) {
+  if (!email) throw new Error('Correo es obligatorio');
+
   // 1. Buscar usuario en la tabla Usuario
   const { data: usuarioData, error: usuarioError } = await supabase
     .from('Usuario')
-    .select('id')
-    .eq('correo', email)
+    .select('Id')
+    .eq('Correo', email)
     .limit(1); // <- limit evita problemas con .single()
 
   if (usuarioError) throw usuarioError;
   if (!usuarioData || usuarioData.length === 0)
     throw new Error('Usuario no encontrado');
 
-  const userId = usuarioData[0].id;
+  const userId = usuarioData[0].Id;
 
   // 2. Eliminar usuario de Supabase Auth
   const { error: authError } = await supabase.auth.admin.deleteUser(userId);
@@ -77,7 +87,7 @@ export async function deleteUserByEmail(email: string) {
   const { error: deleteError } = await supabase
     .from('Usuario')
     .delete()
-    .eq('id', userId);
+    .eq('Id', userId);
 
   if (deleteError) throw deleteError;
 
@@ -86,6 +96,8 @@ export async function deleteUserByEmail(email: string) {
 
 
 export async function getUserByToken(accessToken: string) {
+  if (!accessToken) throw new Error('Token de acceso es obligatorio');
+
   // 1. Obtener usuario de Supabase Auth
   const { data: authData, error: authError } = await supabase.auth.getUser(accessToken);
   if (authError) throw authError;
@@ -97,7 +109,7 @@ export async function getUserByToken(accessToken: string) {
   const { data: usuarioData, error: usuarioError } = await supabase
     .from('Usuario')
     .select('*')
-    .eq('id', userId)
+    .eq('Id', userId)
     .single();
 
   if (usuarioError) throw usuarioError;

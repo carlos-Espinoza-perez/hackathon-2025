@@ -4,36 +4,92 @@ import { deleteUserByEmail, getUserByToken, signIn, signUp } from '../services/u
 /**
  * @swagger
  * tags:
- *   name: User
- *   description: Operaciones de autenticación de usuarios
+ *   name: Usuario
+ *   description: Operaciones de autenticación y gestión de usuarios
+ *
+ * components:
+ *   schemas:
+ *     UserCreate:
+ *       type: object
+ *       required:
+ *         - correo
+ *         - contrasena
+ *         - nombre
+ *       properties:
+ *         correo:
+ *           type: string
+ *           example: usuario@ejemplo.com
+ *         contrasena:
+ *           type: string
+ *           example: password123
+ *         nombre:
+ *           type: string
+ *           example: "Carlos Espinoza"
+ *     UserLogin:
+ *       type: object
+ *       required:
+ *         - email
+ *         - password
+ *       properties:
+ *         email:
+ *           type: string
+ *           example: usuario@ejemplo.com
+ *         password:
+ *           type: string
+ *           example: password123
+ *     DeleteUser:
+ *       type: object
+ *       required:
+ *         - email
+ *       properties:
+ *         email:
+ *           type: string
+ *           example: usuario@ejemplo.com
+ *   responses:
+ *     ValidationError:
+ *       description: Error de validación de datos
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               error:
+ *                 type: string
+ *                 example: "Datos inválidos"
+ *     ServerError:
+ *       description: Error interno del servidor
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               error:
+ *                 type: string
+ *                 example: "Error del servidor"
+ *     UnauthorizedError:
+ *       description: No autorizado
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               error:
+ *                 type: string
+ *                 example: "Token inválido"
  */
 
 /**
  * @swagger
- * /users/register:
+ * /usuario/create:
  *   post:
  *     summary: Registrar un nuevo usuario
- *     tags: [User]
+ *     tags: [Usuario]
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             required:
- *               - correo
- *               - contrasena
- *               - nombre
- *             properties:
- *               correo:
- *                 type: string
- *                 example: usuario@ejemplo.com
- *               contrasena:
- *                 type: string
- *                 example: password123
- *               nombre:
- *                 type: string 
- *                 example: "Carlos Espinoza"
+ *             $ref: '#/components/schemas/UserCreate'
  *     responses:
  *       200:
  *         description: Usuario registrado exitosamente
@@ -53,26 +109,16 @@ export async function register(req: Request, res: Response) {
 
 /**
  * @swagger
- * /users/login:
+ * /usuario/login:
  *   post:
  *     summary: Iniciar sesión de usuario
- *     tags: [User]
+ *     tags: [Usuario]
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             required:
- *               - email
- *               - password
- *             properties:
- *               email:
- *                 type: string
- *                 example: usuario@ejemplo.com
- *               password:
- *                 type: string
- *                 example: password123
+ *             $ref: '#/components/schemas/UserLogin'
  *     responses:
  *       200:
  *         description: Sesión iniciada, retorna token de acceso
@@ -92,22 +138,16 @@ export async function login(req: Request, res: Response) {
 
 /**
  * @swagger
- * /users/delete:
+ * /usuario/delete:
  *   post:
  *     summary: Eliminar un usuario por correo (solo admin)
- *     tags: [User]
+ *     tags: [Usuario]
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             required:
- *               - email
- *             properties:
- *               email:
- *                 type: string
- *                 example: usuario@ejemplo.com
+ *             $ref: '#/components/schemas/DeleteUser'
  *     responses:
  *       200:
  *         description: Usuario eliminado correctamente
@@ -132,10 +172,10 @@ export async function deleteUser(req: Request, res: Response) {
 
 /**
  * @swagger
- * /users/profile:
+ * /usuario/profile:
  *   get:
  *     summary: Obtener información del usuario actual
- *     tags: [User]
+ *     tags: [Usuario]
  *     parameters:
  *       - in: query
  *         name: token
@@ -149,15 +189,7 @@ export async function deleteUser(req: Request, res: Response) {
  *       401:
  *         $ref: '#/components/responses/UnauthorizedError'
  *       400:
- *         description: Token inválido o no proporcionado
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   example: 'Token requerido o no válido'
+ *         $ref: '#/components/responses/ValidationError'
  *       500:
  *         $ref: '#/components/responses/ServerError'
  */
@@ -167,7 +199,6 @@ export async function profile(req: Request, res: Response) {
     if (!token) return res.status(401).json({ error: 'Token requerido' });
 
     const user = await getUserByToken(token);
-
     if (!user) return res.status(401).json({ error: 'Token no válido' });
 
     res.json(user);
@@ -175,6 +206,8 @@ export async function profile(req: Request, res: Response) {
     res.status(400).json({ error: err.message });
   }
 }
+
+
 
 
 

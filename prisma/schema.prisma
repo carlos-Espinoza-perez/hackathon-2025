@@ -15,12 +15,129 @@ datasource db {
 }
 
 
+model Usuario {
+  Id            String           @id @default(uuid())
+  Nombre        String?
+  Correo        String?           @unique
+  Avatar        String?
+  Contrasena    String?
+  Estado        Boolean          @default(true)
+  FechaRegistro DateTime         @default(now())
 
-/// Enums
-enum EnumDificultad {
-  Novato
-  Intermedio
-  Avanzado
+  // Relaciones
+  Progresos     UsuarioProgreso[]
+  Inscripciones InscripcionUsuario[]
+}
+
+model UsuarioProgreso {
+  Id              String                   @id @default(uuid())
+  UsuarioId       String
+  Puntos          Decimal                  @default(0)
+  Racha           Int                      @default(0)
+  RetosCompletados Int                     @default(0)
+  Estado          Boolean                  @default(true)
+  FechaInicio     DateTime                 @default(now())
+
+  // Relaciones
+  Usuario         Usuario                  @relation(fields: [UsuarioId], references: [Id])
+  Registros       RegistroUsuarioProgreso[]
+}
+
+model RegistroUsuarioProgreso {
+  Id                String          @id @default(uuid())
+  UsuarioProgresoId String
+  Punto             Decimal         @default(0)
+  Racha             Int             @default(0)
+  RetosCompletados  Int             @default(0)
+  Estado            Boolean         @default(true)
+  Fecha             DateTime        @default(now())
+
+  UsuarioProgreso   UsuarioProgreso @relation(fields: [UsuarioProgresoId], references: [Id])
+}
+
+model Academia {
+  Id            String      @id @default(uuid())
+  Nombre        String
+  Descripcion   String?
+  Avatar        String?
+  TipoAcademia  EnumTipoAcademia
+  Dificultad    EnumDificultad
+  Estado        Boolean     @default(true)
+  FechaRegistro DateTime    @default(now())
+
+  Cursos        Curso[]
+}
+
+model Curso {
+  Id            String          @id @default(uuid())
+  Nombre        String
+  Descripcion   String?
+  Avatar        String?
+  VideoURL      String?
+  AcademiaId    String
+  Dificultad    EnumDificultad
+  Instruccional String?
+  Estado        Boolean         @default(true)
+  FechaRegistro DateTime        @default(now())
+
+  Academia      Academia        @relation(fields: [AcademiaId], references: [Id])
+  Sesiones      SesionCurso[]
+  Inscripciones InscripcionUsuario[]
+}
+
+model InscripcionUsuario {
+  Id             String          @id @default(uuid())
+  UsuarioId      String
+  CursoId        String?
+  SesionCursoId  String?
+  MaterialSesionCursoId String?
+
+  Avance         Decimal?        @default(0)
+  Estado         Boolean         @default(true)
+  FechaRegistro  DateTime        @default(now())
+
+  Usuario        Usuario         @relation(fields: [UsuarioId], references: [Id])
+  Curso          Curso?          @relation(fields: [CursoId], references: [Id])
+  SesionCurso    SesionCurso?    @relation(fields: [SesionCursoId], references: [Id])
+  MaterialSesion MaterialSesionCurso? @relation(fields: [MaterialSesionCursoId], references: [Id])
+}
+
+model SesionCurso {
+  Id              String                @id @default(uuid())
+  Nombre          String
+  Descripcion     String?
+  Avatar          String?
+  VideoURL        String?
+  LecturaURL      String?
+  CursoId         String
+  DuracionLectura Decimal?              @default(0)
+  DuracionVideo   Decimal?              @default(0)
+  Instruccional   String?
+  Estado          Boolean               @default(true)
+  FechaRegistro   DateTime              @default(now())
+
+  Curso           Curso                 @relation(fields: [CursoId], references: [Id])
+  Materiales      MaterialSesionCurso[]
+
+  // 🔥 Campo inverso para InscripcionUsuario
+  Inscripciones   InscripcionUsuario[]
+}
+
+model MaterialSesionCurso {
+  Id                String          @id @default(uuid())
+  IdentificadorManual String?
+  SesionCursoId     String
+  Nombre            String
+  Avance            Decimal?        @default(0)
+  Avatar            String?
+  ArchivoURL        String?
+  TipoMaterial      EnumTipoMaterial
+  Instruccional     String?
+  Estado            Boolean         @default(true)
+  FechaRegistro     DateTime        @default(now())
+
+  SesionCurso       SesionCurso     @relation(fields: [SesionCursoId], references: [Id])
+  Inscripciones     InscripcionUsuario[]
 }
 
 enum EnumTipoAcademia {
@@ -28,87 +145,15 @@ enum EnumTipoAcademia {
   Laboratorio
 }
 
-/// Tablas
-model Usuario {
-  id             String              @id @default(uuid())
-  nombre         String
-  correo         String              @unique
-  avatar         String?
-  contrasena     String
-  estado         Boolean             @default(true)
-  fechaRegistro  DateTime            @default(now())
-  inscripciones  InscripcionUsuario[]
+enum EnumDificultad {
+  Novato
+  Intermedio
+  Avanzado
 }
 
-model Academia {
-  id             String     @id @default(uuid())
-  nombre         String
-  descripcion    String
-  avatar         String?
-  tipoAcademia   EnumTipoAcademia
-  dificultad     EnumDificultad
-  estado         Boolean    @default(true)
-  fechaRegistro  DateTime   @default(now())
-  cursos         Curso[]
-}
-
-model Curso {
-  id             String        @id @default(uuid())
-  nombre         String
-  descripcion    String
-  avatar         String?
-  videoUrl       String?
-  academiaId     String
-  academia       Academia      @relation(fields: [academiaId], references: [id])
-  dificultad     EnumDificultad
-  estado         Boolean       @default(true)
-  fechaRegistro  DateTime      @default(now())
-  sesiones       SesionCurso[]
-  inscripciones  InscripcionUsuario[]
-}
-
-model SesionCurso {
-  id             String              @id @default(uuid())
-  nombre         String
-  descripcion    String
-  avatar         String?
-  videoUrl       String?
-  lecturaUrl     String?
-  cursoId        String
-  curso          Curso               @relation(fields: [cursoId], references: [id])
-  estado         Boolean             @default(true)
-  fechaRegistro  DateTime            @default(now())
-  materiales     MaterialSesionCurso[]
-  inscripciones  InscripcionUsuario[]
-}
-
-model MaterialSesionCurso {
-  id                  String     @id @default(uuid())
-  identificadorManual String?
-  nombre              String
-  descripcion         String?
-  avatar              String?
-  archivoUrl          String?
-  instruccion         String?
-  estado              Boolean    @default(true)
-  fechaRegistro       DateTime   @default(now())
-  sesionCursoId       String
-  sesionCurso         SesionCurso @relation(fields: [sesionCursoId], references: [id])
-  inscripciones       InscripcionUsuario[]
-}
-
-model InscripcionUsuario {
-  id                    String               @id @default(uuid())
-  usuarioId             String
-  cursoId               String?
-  sesionCursoId         String?
-  materialSesionCursoId String?
-  avance                Decimal?             @db.Decimal(10, 2)
-  estado                Boolean              @default(true)
-  fechaRegistro         DateTime             @default(now())
-
-  usuario               Usuario              @relation(fields: [usuarioId], references: [id])
-  curso                 Curso?               @relation(fields: [cursoId], references: [id])
-  sesionCurso           SesionCurso?         @relation(fields: [sesionCursoId], references: [id])
-  materialSesionCurso   MaterialSesionCurso? @relation(fields: [materialSesionCursoId], references: [id])
+enum EnumTipoMaterial {
+  Documento
+  Prueba
+  Examen
+  Laboratorio
 }
