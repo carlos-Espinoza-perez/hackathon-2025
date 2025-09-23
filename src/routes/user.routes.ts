@@ -4,7 +4,7 @@ import { deleteUser, login, profile, register } from "../controllers/user.contro
 
 const router = Router();
 
-router.post('/register', register);
+router.post('/create', register);
 router.post('/login', login);
 router.post('/delete', deleteUser);
 router.get('/profile', profile);

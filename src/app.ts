@@ -5,7 +5,6 @@ import morgan from 'morgan';
 import { setupSwagger } from './config/swagger.js';
 
 import routes from "./routes/index.js";
-
 const app: Application = express();
 
 // Middlewares globales
@@ -49,6 +48,5 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
       : err.message,
   });
 });
-
 
 export default app;
