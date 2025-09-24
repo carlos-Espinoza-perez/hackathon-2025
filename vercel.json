@@ -1,7 +1,7 @@
 {
   "headers": [
     {
-      "source": "/api-docs/(.*\\.js)",
+      "source": "/swagger-ui/(.*\\.js)",
       "headers": [
         {
           "key": "Content-Type",
@@ -10,7 +10,7 @@
       ]
     },
     {
-      "source": "/api-docs/(.*\\.css)",
+      "source": "/swagger-ui/(.*\\.css)",
       "headers": [
         {
           "key": "Content-Type",
