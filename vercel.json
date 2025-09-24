@@ -1,13 +1,22 @@
 {
-  "version": 2,
-  "rewrites": [
+  "headers": [
     {
-      "source": "/api-docs/(.*)",
-      "destination": "/api/index.js"
+      "source": "/api-docs/(.*\\.js)",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "application/javascript"
+        }
+      ]
     },
     {
-      "source": "/(.*)",
-      "destination": "/api/index.js"
+      "source": "/api-docs/(.*\\.css)",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "text/css"
+        }
+      ]
     }
   ]
 }
