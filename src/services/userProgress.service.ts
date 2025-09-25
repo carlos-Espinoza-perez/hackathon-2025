@@ -27,7 +27,6 @@ export const postRegistroUsuarioProgresoDayService = async (punto?: number, rach
   let usuarioProgresoId: string;
 
   if (!usuarioProgreso.data) {
-    console.log(user);
     // Si no tiene, crear uno nuevo
     const nuevoUsuarioProgreso = await supabase
       .from("UsuarioProgreso")
