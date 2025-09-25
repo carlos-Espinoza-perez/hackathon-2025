@@ -65,28 +65,28 @@ export class AssistantService {
     if (this.systemInstructionsAcademia) {
       await this.client.beta.threads.messages.create(currentThreadId, {
         role: "assistant",
-        content: this.systemInstructionsAcademia,
+        content: `Contexto de Academia: ${this.systemInstructionsAcademia}`,
       });
     }
 
     if (this.systemInstructionsCurso) {
       await this.client.beta.threads.messages.create(currentThreadId, {
         role: "assistant",
-        content: this.systemInstructionsCurso,
+        content: `Contexto de Curso: ${this.systemInstructionsCurso}`,
       });
     }
 
     if (this.systemInstructionsLeccion) {
       await this.client.beta.threads.messages.create(currentThreadId, {
         role: "assistant",
-        content: this.systemInstructionsLeccion,
+        content: `Contexto de Lección: ${this.systemInstructionsLeccion}`,
       });
     }
 
     if (this.systemInstructionsMaterial) {
       await this.client.beta.threads.messages.create(currentThreadId, {
         role: "assistant",
-        content: this.systemInstructionsMaterial,
+        content: `Contexto del Material: ${this.systemInstructionsMaterial}`,
       });
     }
 
@@ -147,9 +147,7 @@ export class AssistantService {
   async cancelRun(threadId: string, runId: string): Promise<void> {
     try {
       await this.client.beta.threads.runs.cancel(threadId, runId as any);
-      console.log(`Run ${runId} cancelado.`);
     } catch (error) {
-      console.error("Error cancelando el run:", error);
     }
   }
 }
