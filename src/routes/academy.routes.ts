@@ -1,6 +1,7 @@
 // src/routes/userProgress.routes.ts
 import { Router } from "express";
 import {
+  generateCertificateServices,
   getAcademyByAcademiaId,
   getCursoByCursoId,
   getListAcademy,
@@ -9,7 +10,8 @@ import {
   getListLastCursos,
   getListSesionCursoByCursoId,
   getProgresoByAcademiaId,
-  getProgresoByCursoId
+  getProgresoByCursoId,
+  postSaveProgresoBySesionCursoId
 } from "../controllers/academy.controller.js";
 
 const router = Router();
@@ -28,5 +30,8 @@ router.get('/getProgresoByAcademiaId/:academiaId', getProgresoByAcademiaId);
 router.get('/getCursoByCursoId/:cursoId', getCursoByCursoId);
 router.get('/getListSesionCursoByCursoId/:cursoId', getListSesionCursoByCursoId);
 router.get('/getProgresoByCursoId/:cursoId', getProgresoByCursoId);
+
+router.post('/postSaveProgresoBySesionCursoId/:sesionCursoId/:avance', postSaveProgresoBySesionCursoId);
+router.post('/generateCertificate/:cursoId', generateCertificateServices);
 
 export default router;

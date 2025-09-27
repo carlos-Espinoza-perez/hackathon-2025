@@ -8,8 +8,10 @@ import {
   getListLastCursosServices,
   getListSesionCursoByCursoIdServices,
   getProgresoByAcademiaIdServices,
-  getProgresoByCursoIdServices
+  getProgresoByCursoIdServices,
+  postSaveProgresoBySesionCursoIdServices
 } from '../services/academy.services.js';
+import { createCertificate } from '../services/certificate.services.js';
 
 /**
  * @swagger
@@ -338,4 +340,96 @@ export const getProgresoByCursoId = async (req: Request, res: Response) => {
   } catch (err: any) {
     res.status(400).json({ error: err.message });
   }
+};
+
+
+
+/**
+ * @swagger
+ * /Academia/postSaveProgresoBySesionCursoId/{sesionCursoId}/{avance}:
+ *   post:
+ *     summary: Guardar progreso del usuario en una sesión de curso
+ *     tags: [Academia]
+ *     parameters:
+ *       - in: path
+ *         name: sesionCursoId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID de la sesión del curso
+ *       - in: path
+ *         name: avance
+ *         schema:
+ *           type: number
+ *           format: float
+ *         required: true
+ *         description: Avance del usuario en la sesión (ej. porcentaje)
+ *     responses:
+ *       200:
+ *         description: Progreso guardado correctamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/UsuarioProgreso'
+ *       400:
+ *         description: Error en la solicitud
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "El parámetro avance es inválido"
+ */
+export const postSaveProgresoBySesionCursoId = async (req: Request, res: Response) => {
+  try {
+    const { sesionCursoId, avance } = req.params;
+    const response = await postSaveProgresoBySesionCursoIdServices(sesionCursoId, parseFloat(avance));
+    res.json(response);
+  } catch (err: any) {
+    res.status(400).json({ error: err.message });
+  }
+};
+
+
+/**
+ * @swagger
+ * /Academia/generateCertificate/{cursoId}:
+ *   post:
+ *     summary: Generar certificado de un curso
+ *     tags: [Academia]
+ *     parameters:
+ *       - in: path
+ *         name: cursoId
+ *         schema:
+ *           type: string
+ *         required: true
+ *         description: ID del curso para generar el certificado
+ *     responses:
+ *       200:
+ *         description: Certificado generado correctamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Certificado generado para el curso ID: abc123"
+ *       400:
+ *         description: Error en la solicitud
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: "No se pudo generar el certificado"
+ */
+export const generateCertificateServices = async (req: Request, res: Response) => {
+  const {cursoId } = req.params;
+  createCertificate();
+  res.json({ message: `Certificado generado para el curso ID: ${cursoId}` });
 };

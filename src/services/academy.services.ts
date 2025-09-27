@@ -1,5 +1,7 @@
 import supabase from "../config/supabaseClient.js";
-import { getUserLogin } from "../utils/general.util.js";
+import { InscripcionUsuario } from "../models/db/inscripcionUsuario.model.js";
+import { getUserLogin, newGuid } from "../utils/general.util.js";
+import { createCertificate } from "./certificate.services.js";
 
 export const getListCursosVistosRecientesServices = async () => { 
   const user = await getUserLogin();
@@ -109,3 +111,44 @@ export const getCursoByCursoIdServices = async (cursoId: string) => {
 
   return curso.data;
 }
+
+export const postSaveProgresoBySesionCursoIdServices = async (sesionCursoId: string, avance: number) => {
+  const user = await getUserLogin();
+
+  const { data: inscripcion } = await supabase
+    .from('InscripcionUsuario')
+    .select('*')
+    .eq('SesionCursoId', sesionCursoId)
+    .single();
+
+  // Si no hay una inscripcion creamos una
+  if (inscripcion == null) {
+    const { data: inscripcionCreated } = await supabase
+      .from('InscripcionUsuario')
+      .insert<InscripcionUsuario>({
+        UsuarioId: user?.Id,
+        SesionCursoId: sesionCursoId,
+        Avance: avance,
+        Estado: true,
+        FechaRegistro: new Date(),
+        Id: newGuid(),
+      })
+      .select('*')
+      .single();
+    
+    return inscripcionCreated;
+  }
+
+  // Si ya existe la inscripcion, actualizamos el avance
+  const nuevoAvance = Math.min((inscripcion.Avance || 0) + avance, 100);
+  const { data: inscripcionUpdated } = await supabase
+    .from('InscripcionUsuario')
+    .update({ Avance: nuevoAvance })
+    .eq('Id', inscripcion.Id)
+    .select('*')
+    .single();
+
+  return inscripcionUpdated;
+}
+   
+
