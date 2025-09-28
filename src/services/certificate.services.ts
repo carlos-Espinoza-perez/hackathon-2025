@@ -69,7 +69,7 @@ class CertificateGen {
         // 2️⃣ Configurar GitHub
         const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
         const owner = "carlos-Espinoza-perez";
-        const repo = "certificate-hackathon-2025";
+        const repo = "files-hackathon-2025";
         const branch = "main";
 
         const safeName = studentData.studentName.replace(/[^a-z0-9_\-]/gi, "_");
