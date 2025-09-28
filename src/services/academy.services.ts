@@ -94,7 +94,10 @@ export const getProgresoByCursoIdServices = async (cursoId: string) => {
 export const getListSesionCursoByCursoIdServices = async (cursoId: string) => {
   const listSesiones = await supabase
     .from('SesionCurso')
-    .select('*')
+    .select(`
+      *,
+      MaterialSesionCurso(*)
+    `)
     .eq('CursoId', cursoId)
     .order('FechaRegistro', { ascending: true });
 
