@@ -429,7 +429,12 @@ export const postSaveProgresoBySesionCursoId = async (req: Request, res: Respons
  *                   example: "No se pudo generar el certificado"
  */
 export const generateCertificateServices = async (req: Request, res: Response) => {
-  const {cursoId } = req.params;
-  createCertificate();
-  res.json({ message: `Certificado generado para el curso ID: ${cursoId}` });
+  try {
+    const {cursoId } = req.params;
+    const response = await createCertificate(cursoId);
+  
+    res.json(response);
+  } catch (error) {
+    res.status(400).json({ error: error });
+  }
 };
