@@ -9,7 +9,8 @@ const app: Application = express();
 
 // Middlewares globales
 app.use(helmet()); // Seguridad HTTP headers
-app.use(cors()); // Habilitar CORS
+app.use(cors());
+
 app.use(morgan('combined')); // Logging de requests
 app.use(express.json({ limit: '10mb' })); // Parser JSON
 app.use(express.urlencoded({ extended: true })); // Parser URL encoded

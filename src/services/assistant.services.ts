@@ -48,7 +48,8 @@ export class AssistantService {
     threadId: string | null,
     message: string,
     onToken: (token: string) => void,
-    onRun?: (runId: string) => void
+    onRun?: (runId: string) => void,
+    sizeResponse: number = 20
   ): Promise<{ threadId: string; fullResponse: string }> {
 
     let currentThreadId = threadId;
@@ -56,11 +57,6 @@ export class AssistantService {
     if (!currentThreadId || !(await this.validateThread(currentThreadId))) {
       currentThreadId = await this.createThread();
     }
-
-    await this.client.beta.threads.messages.create(currentThreadId, {
-      role: "user",
-      content: message,
-    });
 
     if (this.systemInstructionsAcademia) {
       await this.client.beta.threads.messages.create(currentThreadId, {
@@ -89,6 +85,11 @@ export class AssistantService {
         content: `Contexto del Material: ${this.systemInstructionsMaterial}`,
       });
     }
+
+    await this.client.beta.threads.messages.create(currentThreadId, {
+      role: "user",
+      content: message,
+    });
 
     const stream = this.client.beta.threads.runs.stream(currentThreadId, {
       assistant_id: this.assistantId,

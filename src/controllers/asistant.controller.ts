@@ -262,6 +262,9 @@ export const messageIASesion = async (req: Request, res: Response) => {
 
   const sendToken = (token: string) => res.write(`data: ${JSON.stringify({ token })}\n\n`);
 
+  let newMessage = message.replace(/\n/g, " ");
+  newMessage = "Responde de forma breve y concisa o solo si el mensaje siguiente lo contradice: " + message;
+
   try {
     const assistantService = new AssistantService(
       apiKey,
@@ -270,7 +273,7 @@ export const messageIASesion = async (req: Request, res: Response) => {
       instruccionCurso.data.Curso.Instruccional,
       instruccionCurso.data.Descripcion
     );
-    const { threadId: newThreadId } = await assistantService.streamResponse(threadId || null, message, sendToken);
+    const { threadId: newThreadId } = await assistantService.streamResponse(threadId || null, newMessage, sendToken);
     res.write(`data: ${JSON.stringify({ done: true, threadId: newThreadId })}\n\n`);
     res.end();
   } catch (err) {
@@ -340,7 +343,7 @@ export const generateContentSesionBySesionId = async (req: Request, res: Respons
       apiKey,
       assistantId,
       instruccionSesion.data.Curso.Academia.Descripcion,
-      instruccionSesion.data.Curso.Instruccional,
+      instruccionSesion.data.Curso.Descripcion,
       instruccionSesion.data.Descripcion
     );
 
