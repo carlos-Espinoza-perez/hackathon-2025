@@ -60,22 +60,36 @@ El proyecto sigue una **arquitectura por capas** que separa las responsabilidade
    ```
 
 3. **Configurar variables de entorno**
-   ```bash
-   cp .env.example .env
-   ```
-   
-   Edita el archivo `.env` con tus configuraciones:
-   ```env
-   # Puerto de la aplicación
-   PORT=3000
-   
-   # Entorno
-   NODE_ENV=DEV
 
-   # Configuracion Supabase (Gestor de db, Auth login)
-   DATABASE_URL="URL de la base de datos en supabase"
-   SUPABASE_SERVICE_ROLE_KEY="Llave para autenticacion con Auth login supabase"
-   SUPABASE_URL="Url del servicio en Supabase"
+
+   | Variable | Descripción |
+   |---------|-------------|
+   | `PORT` | Puerto en el que se ejecutará el servidor de la aplicación. Ejemplo: `3001`. |
+   | `NODE_ENV` | Entorno de ejecución de la app. Puede ser `DEV`, `PROD` o `TEST`. |
+   | `PASSWORD` | Contraseña utilizada para autenticación interna (por ejemplo, acceso a la base de datos o SSH). |
+   | `DATABASE_URL` | URL de conexión a la base de datos PostgreSQL (usa conexión con *connection pooling*). Debe incluir usuario, contraseña, host, puerto, base de datos y `sslmode=require`. |
+   | `SUPABASE_SERVICE_ROLE_KEY` | Clave de servicio de Supabase con permisos elevados para operaciones del backend. **No exponer en el frontend.** |
+   | `SUPABASE_URL` | URL del proyecto de Supabase. |
+   | `OPENAI_API_KEY` | API Key de OpenAI para consumir modelos de IA. |
+   | `OPENAI_ASSISTANT_ID` | ID del asistente configurado en OpenAI (si se usa un Assistant API). |
+   | `SSH_IP_EXTERNAL` | Dirección IP pública del servidor remoto al que se conecta por SSH. |
+   | `SSH_USER` | Usuario SSH para conectarse al servidor. |
+   | `GITHUB_TOKEN` | Token personal de GitHub (PAT) usado para autenticación en repositorios privados. |
+
+   ### Ejemplo de archivo `.env`
+
+   ```env
+   PORT=3001
+   NODE_ENV=DEV
+   PASSWORD=********
+   DATABASE_URL=postgresql://usuario:contraseña@host:5432/base?sslmode=require
+   SUPABASE_SERVICE_ROLE_KEY=********
+   SUPABASE_URL=https://tu-proyecto.supabase.co
+   OPENAI_API_KEY=********
+   OPENAI_ASSISTANT_ID=********
+   SSH_IP_EXTERNAL=0.0.0.0
+   SSH_USER=usuario
+   GITHUB_TOKEN=********
    ```
 
 4. **Configurar base de datos**
@@ -117,47 +131,96 @@ El proyecto utiliza las siguientes configuraciones principales:
 - **Target ES2022**: Características modernas de JavaScript
 - **Strict Mode**: Habilitado para mayor seguridad de tipos
 
-## 📡 API Endpoints
+## Endpoints de la API
 
-Una vez ejecutando la aplicación, podrás acceder a:
+La API está disponible en:  
+**Servidor de desarrollo:** `http://localhost:3000/api`
 
-- **Health Check**: `GET /health`
-- **API Documentation**: `GET /api-docs` 
-- **Base URL**: `http://localhost:3000/api`
+### 🔑 Autenticación
+La API usa autenticación mediante **Bearer Token (JWT)**.  
+Agrega en el header de cada request:
 
-<!-- ## 🧪 Testing
+```
+http
+Authorization: Bearer <token>
+```
 
-```bash
-# Ejecutar todas las pruebas
-npm test
+---
 
-# Ejecutar pruebas con cobertura
-npm run test:coverage
+### 📚 Endpoints de Academia
 
-# Ejecutar pruebas específicas
-npm test -- --grep "nombre-del-test"
-``` -->
+| Método | Endpoint                                                             | Descripción                                             | Parámetros                       |
+| ------ | -------------------------------------------------------------------- | ------------------------------------------------------- | -------------------------------- |
+| GET    | `/Academia/getListCursosVistosRecientes`                             | Lista de cursos vistos recientemente por el usuario     | -                                |
+| GET    | `/Academia/getListAcademy`                                           | Obtiene la lista de academias disponibles               | -                                |
+| GET    | `/Academia/getListLastCursos`                                        | Obtiene la lista de los últimos cursos agregados        | -                                |
+| GET    | `/Academia/getAcademyByAcademiaId/{academiaId}`                      | Obtiene información de una academia por su ID           | `academiaId` (path)              |
+| GET    | `/Academia/getListCursoByAcademiaId/{academiaId}`                    | Obtiene los cursos de una academia específica           | `academiaId` (path)              |
+| GET    | `/Academia/getProgresoByAcademiaId/{academiaId}`                     | Obtiene el progreso del usuario en una academia         | `academiaId` (path)              |
+| GET    | `/Academia/getCursoByCursoId/{cursoId}`                              | Obtiene información de un curso por su ID               | `cursoId` (path)                 |
+| GET    | `/Academia/getListSesionCursoByCursoId/{cursoId}`                    | Lista de sesiones de un curso                           | `cursoId` (path)                 |
+| GET    | `/Academia/getProgresoByCursoId/{cursoId}`                           | Obtiene el progreso del usuario en un curso específico  | `cursoId` (path)                 |
+| POST   | `/Academia/postSaveProgresoBySesionCursoId/{sesionCursoId}/{avance}` | Guarda el progreso de un usuario en una sesión de curso | `sesionCursoId`, `avance` (path) |
+| POST   | `/Academia/generateCertificate/{cursoId}`                            | Genera un certificado para el curso especificado        | `cursoId` (path)                 |
+
+---
+
+### 🤖 Endpoints del Asistente de IA
+
+| Método | Endpoint                                     | Descripción                                                       | Body                                                                |
+| ------ | -------------------------------------------- | ----------------------------------------------------------------- | ------------------------------------------------------------------- |
+| POST   | `/Asistente/MessageGeneral`                  | Envía un mensaje al asistente de IA general (usa SSE)             | `{ "threadId": "abc123", "message": "Texto del usuario" }`          |
+| POST   | `/Asistente/MessageAcademia`                 | Envía un mensaje al asistente usando el contexto de una academia  | `{ "threadId": "abc123", "academiaId": "xyz", "message": "Texto" }` |
+| POST   | `/Asistente/MessageCurso`                    | Envía un mensaje al asistente usando el contexto de un curso      | `{ "threadId": "abc123", "cursoId": "xyz", "message": "Texto" }`    |
+| POST   | `/Asistente/MessageSesion`                   | Genera contenido usando el contexto de una sesión                 | `{ "threadId": "abc123", "sesionId": "xyz", "message": "Texto" }`   |
+| POST   | `/Asistente/GenerateContentSesionBySesionId` | Genera el contenido de una sesión por ID (sin prompt del usuario) | `{ "threadId": "abc123", "sesionId": "xyz" }`                       |
+
+---
+
+### 👤 Endpoints de Usuario
+
+| Método | Endpoint           | Descripción                                    | Body                                                                  |
+| ------ | ------------------ | ---------------------------------------------- | --------------------------------------------------------------------- |
+| POST   | `/usuario/create`  | Registra un nuevo usuario                      | `{ "correo": "email", "contrasena": "password", "nombre": "Nombre" }` |
+| POST   | `/usuario/login`   | Inicia sesión y retorna token JWT              | `{ "email": "email", "password": "password" }`                        |
+| POST   | `/usuario/delete`  | Elimina un usuario por correo (requiere admin) | `{ "email": "email" }`                                                |
+| GET    | `/usuario/profile` | Obtiene la información del usuario actual      | `token` (query)                                                       |
+
+---
+
+### 📈 Endpoints de UsuarioProgreso
+
+| Método | Endpoint                                          | Descripción                                     | Body                                     |
+| ------ | ------------------------------------------------- | ----------------------------------------------- | ---------------------------------------- |
+| GET    | `/UsuarioProgreso/getUsuarioProrgeso`             | Obtiene el progreso del usuario actual          | -                                        |
+| POST   | `/UsuarioProgreso/postRegistroUsuarioProgresoDay` | Registra el progreso diario del usuario         | `{ "punto": 10, "racha": 3, "reto": 1 }` |
+| GET    | `/UsuarioProgreso/getListUsuarioProgresoTopFive`  | Obtiene el top 5 de usuarios con mejor progreso | -                                        |
+
+---
+
+### 🖥️ Endpoint de Consola / SSH
+
+   | Método | Endpoint               | Descripción                                | Body                      |
+   | ------ | ---------------------- | ------------------------------------------ | ------------------------- |
+   | POST   | `/Consola/ExecCommand` | Ejecuta un comando remoto en la VM vía SSH | `{ "command": "uptime" }` |
+
+---
+
+> **Nota:** Para respuestas de error, la API puede retornar:
+>
+> * **400:** Error de validación (`{ "error": "Mensaje" }`)
+> * **401:** No autorizado (`{ "error": "Token inválido" }`)
+> * **500:** Error interno del servidor
+
+
 
 ## 📚 Tecnologías Utilizadas
 
 - **Runtime**: Node.js
 - **Lenguaje**: TypeScript
 - **Framework**: Express.js
-<!-- - **Base de datos**: [Especificar: PostgreSQL/MongoDB/etc.]
-- **ORM/ODM**: [Especificar: Prisma/Mongoose/Sequelize/etc.]
-- **Testing**: Jest
-- **Validación**: [Especificar: Joi/Zod/express-validator/etc.]
-- **Autenticación**: JWT -->
-
-## 🔒 Variables de Entorno
-
-| Variable | Descripción | Valor por defecto |
-|----------|-------------|-------------------|
-| `PORT` | Puerto del servidor | `3000` |
-| `NODE_ENV` | Entorno de desarollo | `DEV` |
-| `DATABASE_URL` | Base de datos en Supabase | `` |
-| `SUPABASE_SERVICE_ROLE_KEY` | Llave para autenticacion con Auth login supabase | `` |
-| `SUPABASE_URL` | Url del servicio en Supabase | `` |
-
----
-
+- **Base de datos**: PostgreSQL
+- **ORM/ODM**: Prisma
+- **Validación**: express-validator
+- **Autenticación**: JWT
+<!-- - **Testing**: Jest -->
