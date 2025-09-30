@@ -4,8 +4,6 @@ export async function signUp(nombre: string, email: string, password: string) {
   if (!nombre || !email || !password) {
     throw new Error('Nombre, correo y contraseña son obligatorios');
   }
-
-
   // 1. Crear usuario en Supabase Auth
   const { data: authData, error: authError } = await supabase.auth.admin.createUser({
     email,
