@@ -109,7 +109,7 @@ export async function register(req: Request, res: Response) {
 
 /**
  * @swagger
- * /usuario/login:
+ * /Usuario/login:
  *   post:
  *     summary: Iniciar sesión de usuario
  *     tags: [Usuario]
@@ -129,6 +129,7 @@ export async function register(req: Request, res: Response) {
  */
 export async function login(req: Request, res: Response) {
   try {
+    console.log({ req, res })
     const session = await signIn(req.body.email, req.body.password);
     res.json(session);
   } catch (err: any) {
